@@ -31,5 +31,21 @@ Tarefas a realizar:
 
 ## Conteúdo utilizado
 
-- Dataset: `dataset3.zip`
+- Datasets:
+  - Dataset não anomolo: `dataset3.parquet`
+  - Dataset anomalo: `teste3.parquet`
+  - Dataset de servidores externos: `servers3.parquet`
 - GeoIP_DB: `GeoIP_DB.zip`
+
+## Lista de Tarefas
+
+1º saber se o atacante está dentro ou fora da rede(a usar tunnels);
+2º Ver quais os utilizadores enviam tamanhos grandes de informação para fora da rede;
+Duração de download e upload são importantes;
+Média do número de conexões, por hora, por dia e criar assim o modelo;
+DNS/NON-DNS, ver domínios estranhos e logs;
+DNS de https, verificar comportamentos, se temos DNS cifrado que não o nosso, então ao histórico dos logs e ver;
+Broswer != Https,  obter o ration de Upload < Download;
+Anomalias de transferência de dados, o tipo de anomalia;
+Maioritária mente temos mais downloads que Uploads por utilizador;
+Fazer verificações por conexões(TCP, UDP)
