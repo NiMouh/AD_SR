@@ -14,7 +14,8 @@
 
 ## Objetivo
 
-Definir regras SIEM para detetar comportamentos de rede anómalos e dispositivos possivelmente comprometidos. Testar as regras definidas num registo de dados de fluxos de tráfego IP, identificando os dispositivos comprometidos.
+Definir regras SIEM para detetar comportamentos de rede anómalos e dispositivos possivelmente comprometidos. Testar as
+regras definidas num registo de dados de fluxos de tráfego IP, identificando os dispositivos comprometidos.
 
 Tarefas a realizar:
 
@@ -31,21 +32,23 @@ Tarefas a realizar:
 
 ## Conteúdo utilizado
 
-- Datasets:
-  - Dataset não anomolo: `dataset3.parquet`
-  - Dataset anomalo: `teste3.parquet`
-  - Dataset de servidores externos: `servers3.parquet`
+- Datasets: `dataset3.zip`
+    - Dataset não anómalo: `dataset3.parquet`
+    - Dataset anómalo: `teste3.parquet`
+    - Dataset de servidores externos: `servers3.parquet`
 - GeoIP_DB: `GeoIP_DB.zip`
+    - GeoIPASNum.dat: base de dados para identificar o *Autonomous System* (rede de IPs de uma organização) de um IP;
+    - GeoIP.dat: base de dados para identificar a localização geográfica de um IP;
 
 ## Lista de Tarefas
 
-1º saber se o atacante está dentro ou fora da rede(a usar tunnels);
-2º Ver quais os utilizadores enviam tamanhos grandes de informação para fora da rede;
-Duração de download e upload são importantes;
-Média do número de conexões, por hora, por dia e criar assim o modelo;
-DNS/NON-DNS, ver domínios estranhos e logs;
-DNS de https, verificar comportamentos, se temos DNS cifrado que não o nosso, então ao histórico dos logs e ver;
-Broswer != Https,  obter o ration de Upload < Download;
-Anomalias de transferência de dados, o tipo de anomalia;
-Maioritária mente temos mais downloads que Uploads por utilizador;
-Fazer verificações por conexões(TCP, UDP)
+- saber se o atacante está dentro ou fora da rede(a usar tunnels);
+- ver quais os utilizadores enviam tamanhos grandes de informação para fora da rede;
+- duração de download e upload são importantes;
+- média do número de conexões, por hora, por dia e criar assim o modelo;
+- DNS/NON-DNS, ver domínios estranhos e logs;
+- DNS de https, verificar comportamentos, se temos DNS cifrado que não o nosso, então ao histórico dos logs e ver;
+- Broswer != Https, obter o ration de Upload < Download;
+- Anomalias de transferência de dados, o tipo de anomalia;
+- Maioritária mente temos mais downloads que Uploads por utilizador;
+- Fazer verificações por conexões(TCP, UDP)
