@@ -20,7 +20,7 @@ regras definidas num registo de dados de fluxos de tráfego IP, identificando os
 Tarefas a realizar:
 
 - [ ] Análise dos comportamentos não anómalos (4 valores):
-    - [ ] Identificar servidores/serviços internos
+    - [x] Identificar servidores/serviços internos
     - [ ] Descrever e quantificar as trocas de tráfego dos utilizadores internos com os servidores internos e externos
     - [ ] Descrever e quantificar trocas de tráfego dos utilizadores externos com os servidores públicos da empresa
 - [ ] Definição das regras SIEM (6 valores):
@@ -40,15 +40,50 @@ Tarefas a realizar:
     - GeoIPASNum.dat: base de dados para identificar o *Autonomous System* (rede de IPs de uma organização) de um IP;
     - GeoIP.dat: base de dados para identificar a localização geográfica de um IP;
 
-## Lista de Tarefas
+## Lista do Simão
+
+Inicialmente:
+
+- [x] Ip's de origem e destino
+- [x] Portas comuns
+- [x] Protocolos comuns
+- [x] Número de pacotes (por src_ip)
+- [ ] Rácio de download/upload (por src_ip)
+- [ ] Localização geográfica dos IPs (dos dst_ip para cada src_ip)
+- [ ] Domínios DNS visitados (por src_ip)
+- [ ] Número de conexões por ~~hora~~ (por src_ip)
+
+Depois:
+
+- [ ] Detetar atividades de BotNet (número de conexões por hora)
+- [ ] Detetar exfiltração de dados (Taxas anómalas de transferência de dados)
+- [ ] Detetar atividades de C&C (número e tamanho de pacotes DNS anómalo)
+
+Por fim:
+
+- [ ] Identificar dispositivos comprometidos (identificar os IPs que violam as regras definidas)
+- [ ] Tentar identificar o tipo de comprometimento (BotNet, exfiltração de dados, C&C)
+- [ ] Justificar a identificação dos dispositivos comprometidos
+
+## Lista da Ana
+
+Isto não dá para fazer:
 
 - saber se o atacante está dentro ou fora da rede(a usar tunnels);
+
+Determinar Download e upload:
+
 - ver quais os utilizadores enviam tamanhos grandes de informação para fora da rede;
-- duração de download e upload são importantes;
+- duração de ‘download’ e ‘upload’ são importantes;
+- Broswer != Https, obter o ratio de Upload < Download;
+- Maioritáriamente temos mais ‘downloads’ que ‘uploads’ por utilizador;
+
+Dados:
+
 - média do número de conexões, por hora, por dia e criar assim o modelo;
+- Anomalias de transferência de dados, o tipo de anomalia;
+
+DNS:
+
 - DNS/NON-DNS, ver domínios estranhos e logs;
 - DNS de https, verificar comportamentos, se temos DNS cifrado que não o nosso, então ao histórico dos logs e ver;
-- Broswer != Https, obter o ration de Upload < Download;
-- Anomalias de transferência de dados, o tipo de anomalia;
-- Maioritária mente temos mais downloads que Uploads por utilizador;
-- Fazer verificações por conexões(TCP, UDP)
