@@ -48,7 +48,7 @@ Inicialmente:
 - [x] Portas comuns
 - [x] Protocolos comuns
 - [x] Número de pacotes (por src_ip)
-- [ ] Rácio de download/upload (por src_ip)
+- [x] Rácio de download/upload (por src_ip)
 - [ ] Localização geográfica dos IPs (dos dst_ip para cada src_ip)
 - [ ] Domínios DNS visitados (por src_ip)
 - [ ] Número de conexões por ~~hora~~ (por src_ip)
