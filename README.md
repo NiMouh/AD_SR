@@ -51,12 +51,12 @@ Tarefas a realizar:
     - [x] Localização geográfica dos IPs (dos dst_ip para cada src_ip)
     - [ ] Domínios DNS visitados (por src_ip)
     - [ ] Fazer mais análise às comunicações internas (src_ip e dst_ip)
-    - [ ] Número de conexões por ~~hora~~ (por src_ip)
+    - [x] Número de conexões por ~~hora~~ (por src_ip)
 
 - Seguidamente:
-    - [ ] Detetar atividades de BotNet (número de conexões por hora)
-    - [ ] Detetar exfiltração de dados (Taxas anómalas de transferência de dados)
-    - [ ] Detetar atividades de C&C (número e tamanho de pacotes DNS anómalo)
+    - [x] Detetar atividades de BotNet (número de conexões por hora)
+    - [x] Detetar exfiltração de dados (Taxas anómalas de transferência de dados)
+    - [x] Detetar atividades de C&C (número e tamanho de pacotes DNS anómalo)
 
 - Finalmente:
     - [x] Identificar dispositivos comprometidos (identificar os IPs que violam as regras definidas)
@@ -99,25 +99,75 @@ As regras seguem a seguinte estrutura:
 
 ### Regras Identificadas
 
+#### Regras para fluxos de tráfego interno-interno e interno-externo
+
 1. **Alta percentagem de tráfego enviado por um único utilizador**
-    - **Detetar**: Atividades de BotNet
-    - **Justificação**: BotNet é uma rede de dispositivos infetados com malware que são controlados remotamente por um
-      atacante. Estes dispositivos enviam tráfego para um servidor C&C, que pode ser detetado por uma alta percentagem
-      de tráfego enviada por um único utilizador.
-    - **Regra**: Se um utilizador enviar mais de 2% do tráfego total, então detetar atividades de BotNet.
+    - **Detetar**: Atividades de BotNet, Ataques de DDoS
+    - **Justificação**: Um evento de DDoS pode ser detetado se um utilizador enviar uma abundância de tráfego
+      para um (ou multiplos) destino, o que pode sobrecarregar o servidor e causar uma interrupção do serviço.
+    - **Regra**: Se um utilizador enviar mais de 2% do tráfego total detetar anomalia.
+2. **Taxas anómalas de _upload_ de dados (no geral)**
+    - **Detetar**: _Data Exfiltration_, Má configuração de serviços, _Malware_/_Ransomware_
+    - **Justificação**: A exfiltração de dados é uma técnica comum usada por atacantes para roubar informações
+      sensíveis.
+      Se um utilizador enviar uma quantidade anormalmente grande de dados para fora da rede, isso pode indicar que
+      informações confidenciais são roubadas e a serem enviadas para um servidor externo.
+    - **Regra**: Se a variação dos dados enviados em comparação com uma quantidade considerada normal for superior a 1%
+      ou menor que -1%, então detetar anomalia.
+3. **Taxas anómalas de _download_/_upload_ de dados via DNS**
+    - **Detetar**: Atividades de C&C (_Command & Control_) ou Ataques de _DNS Amplification_
+    - **Justificação**: Taxas altas de _download_ comparadas com _upload_ podem indicar respostas DNS excessivamente
+      grandes, típicas de ataques de amplificação DNS ou comunicação maliciosa via DNS.
+    - **Regra**: Se o número de pacotes DNS enviados tiver uma variação superior a 0,8 em comparação com os valores
+      normais, então detetar anomalia.
+4. **Taxas altas de comunicação com máquinas localizadas em novos países**
+    - **Detetar**: Acesso não autorizado, _Data Exfiltration_
+    - **Justificação**: A comunicação com máquinas localizadas em novos países pode indicar que uma das máquinas
+      envolvidas foi comprometida e encontra-se a comunicar com um servidor malicioso localizado noutro país.
+    - **Regra**: Se a variação de pacotes enviados para um novo pais for superior a 1% em comparação com os valores
+      normais, então detetar anomalia.
+
+### Regras para fluxos de tráfego externo-interno
+
+1. **Deteção de Picos Anómalos no Tráfego de _downloads_**
+    - **Regra**: Configurar alertas para quando o tráfego de _downloads_ exceder 400,000 bytes num curto período de
+      tempo.
+    - **Justificação**: Picos significativos no tráfego de _downloads_ podem indicar a transferência de abundância de
+      dados, possivelmente devido a _downloads_ massivos ou sincronizações de dados, o que pode ser um
+      sinal de atividades suspeitas ou não autorizadas.
+
+2. **Deteção de Picos Anómalos no Tráfego de _uploads_**
+    - **Regra**: Configurar alertas para quando o tráfego de _uploads_ exceder 50,000 bytes.
+    - **Justificação**: Picos elevados no tráfego de _uploads_ podem indicar a exfiltração de dados ou ‘uploads’
+      massivos,
+      o que pode ser uma atividade maliciosa, como o roubo de dados ou a transmissão de informação sensível para fora da
+      rede.
+
+3. **Monitorização de IPs Específicos**
+    - **Regra**: Manter um monitoramento constante do IP 82.155.123.113 devido ao seu comportamento anómalo e picos de
+      tráfego.
+    - **Justificação**: O IP 82.155.123.113 mostrou padrões de tráfego anómalos, incluindo picos significativos de
+      dados. A monitorização contínua ajuda a identificar atividades incomuns e a responder rapidamente a possíveis
+      incidentes de segurança.
+
+4. **Alertas de Alta Frequência de Pacotes**
+    - **Regra**: Configurar alertas para atividades de alta frequência, como inúmeros pacotes enviados num curto
+      intervalo de tempo.
+    - **Justificação**: Um elevado número de pacotes num curto período pode indicar ataques de negação de serviço (DoS)
+      ou outras atividades maliciosas que tentam sobrecarregar a rede ou comprometer a segurança.
 
 ### Dispositivos comprometidos (Por completar)
 
 A lista seguinte apresenta os dispositivos e o número de regras violadas correspondente:
 
-| IP              | # |
-|-----------------|:-:|
-| 192.168.103.185 | 1 |
-| 192.168.103.169 | 1 |
-| 192.168.103.125 | 2 |
-| 192.168.103.90  | 2 |
-| 192.168.103.85  | 1 |
-| 192.168.103.84  | 1 |
-| 192.168.103.69  | 1 |
+| IP              | Regra 1 | Regra 2 | Regra 3 | Regra 4 | # |
+|-----------------|:-------:|:-------:|:-------:|:-------:|:-:|
+| 192.168.103.185 |         |         |         |    X    | 1 |
+| 192.168.103.169 |         |         |         |    X    | 1 |
+| 192.168.103.125 |    X    |         |    X    |         | 2 |
+| 192.168.103.90  |    X    |         |    X    |         | 2 |
+| 192.168.103.85  |         |    X    |         |         | 1 |
+| 192.168.103.84  |         |         |         |    X    | 1 |
+| 192.168.103.69  |         |    X    |         |         | 1 |
 
 Pode-se então concluir que os dispositivos com os IPs ` ` estão de facto comprometidos.
