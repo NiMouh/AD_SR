@@ -1,4 +1,4 @@
-# Trabalho Prático 2 de Segurança em Redes de Computadores
+# _Monitoring & SIEM_ - Trabalho Prático 2 de Segurança em Redes de Computadores
 
 ## Autores
 
@@ -9,40 +9,57 @@
 
 1. Introdução
 2. Objetivo
+3. Conteúdo utilizado
+4. Implementação
+    1. Processo de Análise
+    2. Análise dos comportamentos não anómalos
+    3. Definição das regras SIEM
+    4. Teste das regras SIEM e identificação dos dispositivos comprometidos
+5. Conclusão
 
 ## Introdução
 
+O objetivo principal deste projeto é a definição de regras de Sistema de Gestão de Informação e Eventos de
+Segurança (SIEM) para a deteção de comportamentos anómalos em redes de comunicação e a identificação de dispositivos
+possivelmente comprometidos.
+
+A análise será conduzida utilizando um conjunto de dados de fluxos de tráfego IP.
+
 ## Objetivo
 
-Definir regras SIEM para detetar comportamentos de rede anómalos e dispositivos possivelmente comprometidos. Testar as
-regras definidas num registo de dados de fluxos de tráfego IP, identificando os dispositivos comprometidos.
-
-Tarefas a realizar:
+Na realização deste trabalho, as tarefas a serem realizadas são as seguintes:
 
 - [x] Análise dos comportamentos não anómalos (4 valores):
     - [x] Identificar servidores/serviços internos
     - [x] Descrever e quantificar as trocas de tráfego dos utilizadores internos com os servidores internos e externos
     - [x] Descrever e quantificar trocas de tráfego dos utilizadores externos com os servidores públicos da empresa
-- [ ] Definição das regras SIEM (6 valores):
-    - [ ] Respetiva justificação para a deteção de atividades BotNet internas
-    - [ ] Exfiltração de dados usando HTTPS e/ou DNS
-    - [ ] Atividades de C&C usando DNS e utilizadores externos usando os serviços públicos empresariais de forma anómala
-- [ ] Teste das regras SIEM e identificação dos dispositivos com comportamentos anómalos (6 valores).
+- [x] Definição das regras SIEM (6 valores):
+    - [x] Respetiva justificação para a deteção de atividades BotNet internas
+    - [x] Exfiltração de dados usando HTTPS e/ou DNS
+    - [x] Atividades de C&C usando DNS e utilizadores externos usando os serviços públicos empresariais de forma anómala
+- [x] Teste das regras SIEM e identificação dos dispositivos com comportamentos anómalos (6 valores).
 - [ ] Relatório (4 valores)
 
 ## Conteúdo utilizado
 
+Para a realização deste trabalho, foram disponibilizados os seguintes ficheiros:
+
 - Datasets: `dataset3.zip`
     - Dataset não anómalo: `dataset3.parquet`
     - Dataset anómalo: `teste3.parquet`
-    - Dataset de servidores externos: `servers3.parquet`
+    - Dataset apenas c/ comunicação externa: `servers3.parquet`
 - GeoIP_DB: `GeoIP_DB.zip`
     - Base de dados para identificar o *Autonomous System* (rede de IPs de uma organização) de um IP: `GeoIP_ASNum.dat`
     - Base de dados para identificar a localização geográfica de um IP: `GeoIP.dat`
 
-## Processo de Análise
+## Implementação
 
-- Inicialmente:
+### Processo de Análise
+
+Foi inicialmente nesta fase definido um conjunto de análises a serem realizadas sobre os datasets fornecidos, para obter
+uma visão geral dos comportamentos a procurar.
+
+- **Inicialmente**:
     - [x] Ip's de origem e destino
     - [x] Portas comuns
     - [x] Protocolos comuns
@@ -52,41 +69,124 @@ Tarefas a realizar:
     - [ ] Domínios DNS visitados (por src_ip)
     - [ ] Fazer mais análise às comunicações internas (src_ip e dst_ip)
     - [x] Número de conexões por ~~hora~~ (por src_ip)
-
-- Seguidamente:
+- **Seguidamente**:
     - [x] Detetar atividades de BotNet (número de conexões por hora)
     - [x] Detetar exfiltração de dados (Taxas anómalas de transferência de dados)
     - [x] Detetar atividades de C&C (número e tamanho de pacotes DNS anómalo)
-
-- Finalmente:
+- **Finalmente**:
     - [x] Identificar dispositivos comprometidos (identificar os IPs que violam as regras definidas)
     - [ ] Tentar identificar o tipo de comprometimento (BotNet, exfiltração de dados, C&C)
     - [ ] Justificar a identificação dos dispositivos comprometidos
 
-## Lista da Ana
+### Análise dos comportamentos não anómalos
 
-Isto não dá para fazer:
+Nesta secção, são analisados os comportamentos não anómalos dos utilizadores internos e das suas comunicações com a rede
+interna e com as redes externas.
 
-- saber se o atacante está dentro ou fora da rede(a usar tunnels);
+#### Protocolos utilizados
 
-Determinar Download e upload:
+Na análise dos comportamentos não anómalos, observamos que os pacotes de dados são divididos principalmente entre dois
+protocolos de transporte: TCP e UDP.
 
-- ver quais os utilizadores enviam tamanhos grandes de informação para fora da rede;
-- duração de ‘download’ e ‘upload’ são importantes;
-- Broswer != Https, obter o ratio de Upload < Download;
-- Maioritáriamente temos mais ‘downloads’ que ‘uploads’ por utilizador;
+Conforme indicado nos gráficos abaixos, a maioria dos pacotes são do protocolo TCP, representando cerca de 88.06% do
+tráfego total, enquanto os pacotes UDP correspondem a 11.94%.
 
-Dados:
+<div style="display: flex; justify-content: center;">
+    <img src="img/protocol.png" alt="Protocolos utilizados" width="500" >
+    <img src="img/protocol2.png" alt="Protocolos utilizados" width="500">
+</div>
+<p align="center">
+    <i> Figura 1: Protocolos utilizados no _dataset_ não anómalo (esquerda) e anómalo (direita)</i>
+</p>
 
-- média do número de conexões, por hora, por dia e criar assim o modelo;
-- Anomalias de transferência de dados, o tipo de anomalia;
+Esta distribuição é consistente com a utilização típica de redes corporativas.
 
-DNS:
+#### Portas utilizadas
 
-- DNS/NON-DNS, ver domínios estranhos e logs;
-- DNS de https, verificar comportamentos, se temos DNS cifrado que não o nosso, então ao histórico dos logs e ver;
+A análise das portas utilizadas mostra uma predominância do tráfego HTTPS, seguido por DNS. Como podemos observar no
+gráfico abaixo, quase 90% dos pacotes são HTTPS, indicando um uso intensivo de navegação web segura e serviços
+relacionados.
 
-## Regras SIEM
+<div style="display: flex; justify-content: center;">
+    <img src="img/port.png" alt="Portas Utilizadas" width="500">
+    <img src="img/port2.png" alt="Portas Utilizadas" width="500">
+</div>
+<p align="center">
+    <i> Figura 2: Portas utilizadas no _dataset_ não anómalo (esquerda) e anómalo (direita)</i>
+</p>
+
+O _dataset_ anómalo mostra uma pequena diferença entre o número de pacotes DNS e HTTPS, com um número mais elevado de
+pacotes DNS (>7% relativamente ao _dataset_ não anómalo).
+
+Este facto pode indicar ataques como o _DNS flooding_.
+
+#### Número de pacotes (por endereço de origem)
+
+Os gráficos abaixo apresentam o número de pacotes enviados pelos 100 principais endereços IP de origem no dataset não
+anómalo. Os endereços IPs mais ativos foram identificados e contabilizados, tendo dois endereços com um envio maior.
+
+<div style="display: flex; justify-content: center;">
+    <img src="img/packets.png" alt="Número de Pacotes por Endereço de Origem" width="700">
+    <img src="img/packets2.png" alt="Número de Pacotes por Endereço de Origem" width="700">
+</div>
+<p align="center">
+    <i> Figura 3: Número de pacotes enviados pelos 100 principais endereços IP de origem no dataset não anómalo (esquerda) e anómalo (direita)</i>
+</p>
+
+#### Rácio de _download_/_upload_ (por endereço de origem)
+
+Esta análise do rácio revela que, em geral, a quantidade de bytes baixados é significativamente maior do que a
+quantidade de bytes enviados, como ilustrado nos gráficos abaixo.
+
+<div style="display: flex; justify-content: center;">
+    <img src="img/download_upload.png" alt="Rácio de Download/Upload por Endereço de Origem" width="700">
+    <img src="img/download_upload2.png" alt="Rácio de Download/Upload por Endereço de Origem" width="700">
+</div>
+<p align="center">
+    <i> Figura 4: Rácio de _download_/_upload_ por endereço de origem no dataset não anómalo (esquerda) e anómalo (direita)</i>
+</p>
+
+<div style="display: flex; justify-content: center;">
+    <img src="img/download_upload_dns.png" alt="Rácio de Download/Upload por Endereço de Origem" width="700">
+    <img src="img/download_upload_dns2.png" alt="Rácio de Download/Upload por Endereço de Origem" width="700">
+</div>
+<p align="center">
+    <i> Figura 5: Rácio de _download_/_upload_ por endereço de origem no dataset não anómalo (esquerda) e anómalo (direita) para pacotes DNS</i>
+</p>
+
+#### Localização geográfica dos IPs
+
+A localização geográfica dos IPs de destino mostra que a maioria do tráfego é direcionada para os Estados Unidos,
+seguido por Portugal. Este padrão é esperado, dada a natureza global das comunicações corporativas. Contudo, na análise
+do dataset anómalo, surgiram **38** novos países no _dataset_ anómalo, o que pode indicar atividades suspeitas.
+
+```
+Anomalous dataset:
+country_code
+US    32.510430
+PT    24.892034
+NA     1.842787
+NL     1.799620
+DE     1.693245
+        ...    
+IQ     0.000193
+IS     0.000096
+MD     0.000096
+VN     0.000096
+MX     0.000096
+```
+
+Foi definido um _threshold_ de variação de 1% e dentro destes países, destacam-se a Rússia e a Ucrânia:
+
+```
+   country  variation  is_new
+37      RU   0.273937    True
+38      UA   0.011370    True
+```
+
+#### Número de conexões por hora (por endereço de origem)
+
+### Definição das regras SIEM
 
 Nesta secção, são definidas regras SIEM para detetar comportamentos de rede anómalos e dispositivos possivelmente
 comprometidos.
@@ -142,14 +242,12 @@ As regras seguem a seguinte estrutura:
       massivos,
       o que pode ser uma atividade maliciosa, como o roubo de dados ou a transmissão de informação sensível para fora da
       rede.
-
 3. **Monitorização de IPs Específicos**
     - **Regra**: Manter um monitoramento constante do IP 82.155.123.113 devido ao seu comportamento anómalo e picos de
       tráfego.
     - **Justificação**: O IP 82.155.123.113 mostrou padrões de tráfego anómalos, incluindo picos significativos de
       dados. A monitorização contínua ajuda a identificar atividades incomuns e a responder rapidamente a possíveis
       incidentes de segurança.
-
 4. **Alertas de Alta Frequência de Pacotes**
     - **Regra**: Configurar alertas para atividades de alta frequência, como inúmeros pacotes enviados num curto
       intervalo de tempo.
@@ -171,3 +269,51 @@ A lista seguinte apresenta os dispositivos e o número de regras violadas corres
 | 192.168.103.69  |         |    X    |         |         | 1 |
 
 Pode-se então concluir que os dispositivos com os IPs ` ` estão de facto comprometidos.
+
+## Conclusão
+
+Com base nos dados analisados, foi possível identificar padrões típicos de comportamento dentro da rede. Estes padrões
+incluem uma predominância de tráfego TCP e HTTPS, com um rácio _download_/_upload_ que favorece o download. Estas
+observações são consistentes com o uso regular de uma rede corporativa.
+
+Os principais objetivos deste trabalho foram atingidos com sucesso. Conseguimos identificar os servidores e serviços
+internos principais, bem como descrever e quantificar as trocas de tráfego entre utilizadores internos e externos. A
+análise detalhada dos comportamentos não anómalos permitiu a definição de regras SIEM fundamentadas, essenciais para a
+deteção de atividades anómalas.
+
+No entanto, há áreas que poderiam ser melhoradas. A análise de dados poderia ser aprofundada incluindo mais parâmetros,
+como a duração das conexões e o comportamento ao longo do tempo, o que proporcionaria uma visão ainda mais detalhada dos
+padrões de tráfego. Além disso, a automação de algumas análises tornaria o processo mais eficiente e menos suscetível a
+erros humanos.
+
+Em suma, este trabalho proporcionou um aprendizado significativo sobre a análise de tráfego de rede e a implementação de
+sistemas
+de deteção de intrusões. Adquirimos habilidades importantes na análise de grandes volumes de dados de tráfego de rede
+para identificar padrões e anomalias, bem como na definição e implementação de regras SIEM eficazes baseadas em dados
+concretos. Estes conhecimentos e habilidades adquiridos são fundamentais para futuras análises e implementações em
+ambientes reais, proporcionando uma base sólida para a prática da segurança em redes de comunicação.
+
+## Lista da Ana
+
+Isto não dá para fazer:
+
+- saber se o atacante está dentro ou fora da rede(a usar tunnels);
+
+Determinar Download e upload:
+
+- ver quais os utilizadores enviam tamanhos grandes de informação para fora da rede;
+- duração de ‘download’ e ‘upload’ são importantes;
+- Broswer != Https, obter o ratio de Upload < Download;
+- Maioritáriamente temos mais ‘downloads’ que ‘uploads’ por utilizador;
+
+Dados:
+
+- média do número de conexões, por hora, por dia e criar assim o modelo;
+- Anomalias de transferência de dados, o tipo de anomalia;
+
+DNS:
+
+- DNS/NON-DNS, ver domínios estranhos e logs;
+- DNS de https, verificar comportamentos, se temos DNS cifrado que não o nosso, então ao histórico dos logs e ver;
+
+## Regras SIEM
