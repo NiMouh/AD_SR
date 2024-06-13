@@ -125,7 +125,7 @@ podem indicar mudanças no comportamento da rede:
 - **UDP**: Mantém uma presença significativa, embora existam variações no volume de pacote comparado ao dataset não
   anómalo (+7%).
 
-#### Conclusões
+##### Conclusões
 
 Qualquer variação significativa na proporção entre TCP e UDP no dataset anómalo, com comparação com o dataset não
 anómalo, pode indicar mudanças no padrão de utilização da rede. Estas mudanças podem ser indicativas de atividades
@@ -356,7 +356,25 @@ Definindo um _threshold_ de variação de 1% e dentro destes países, destacam-s
 
 #### Conclusões
 
-## Análise dos Comportamentos do Server Dataset 
+### Domínios DNS visitados
+
+A análise dos domínios DNS visitados pelos utilizadores internos não revelou anomalias significativas:
+
+```
+Detected 0 DNS anomalies
+DNS Anomalies:
+Empty DataFrame
+Columns: [timestamp, src_ip, dst_ip, proto, port, up_bytes, down_bytes]
+Index: []
+
+Resolved IP Addresses:
+Empty DataFrame
+```
+<p align="center">
+    <i> Tabela 1: Anomalias DNS detetadas (pacotes com taxas de download/upload altas)</i>
+</p>
+
+## Análise dos Comportamentos do Server Dataset
 
 Agora vamos analisar o tráfico enviado para fora da rede. Deste modo, vamos analisar o número de pacotes por IP, as
 portas usadas, o numero total de upload e downloads por IP, número de pacotes enviados por minuto, como também a
@@ -364,28 +382,86 @@ consistencia de tráfico ao longo do tempo e o tempo total de tráfico.
 
 ### Número de Uploads e Downloads por IP
 
-<img src="img.png" style="align-items: center">
+<img src="img/img.png" style="align-items: center">
 
 ### Portas Usadas
 
-<img src="img_1.png" style="align-items: center">
+<img src="img/img_1.png" style="align-items: center">
 
 ### Número Total de Pacotes enviados por IPs
 
-<img src="img_2.png" style="align-items: center">
+<img src="img/img_2.png" style="align-items: center">
 
 ### Tráfico por minuto de cada IP
 
-<img src="img_3.png" style="align-items: center">
-<img src="img_4.png" style="align-items: center">
-<img src="img_5.png" style="align-items: center">
-<img src="img_6.png" style="align-items: center">
-<img src="img_7.png" style="align-items: center">
+<img src="img/img_3.png" style="align-items: center">
+<img src="img/img_4.png" style="align-items: center">
+<img src="img/img_5.png" style="align-items: center">
+<img src="img/img_6.png" style="align-items: center">
+<img src="img/img_7.png" style="align-items: center">
+
+### Taxa de Conexões por IP
+
+Além disso, foi analisado a taxa tempos de conexões por IP para perceber quais IPs tentam estabelecer mais
+conexões e quais têm uma taxa de duração de conexão mais elevada.
+
+Obtendo-se os seguintes resultados:
+
+<div style="display: flex; justify-content: center;">
+    <img src="img/server_connections.png" alt="Taxa de conexões por IP" width="700">
+</div>
+<p align="center">
+    <i> Gráfico 1: Taxa de conexões por IP</i>
+</p>
+
+Podemos reparar um valor significatipo de comportamento não anómalo, com conexões que duram 10x que o normal, o que pode
+ser indicativo de um comportamento anómalo.
+
+```
+                     timestamp          src_ip      dst_ip proto  port
+index                                                                    
+193632 1970-01-01 01:42:29.450  82.155.123.146  200.0.0.11   tcp   443   
+644712 1970-01-01 01:13:29.219   82.155.123.47  200.0.0.11   tcp   443   
+216472 1970-01-01 01:24:17.012  82.155.123.100  200.0.0.12   tcp   443   
+101934 1970-01-01 01:28:57.751  82.155.123.210  200.0.0.12   tcp   443   
+310113 1970-01-01 01:30:48.031   82.155.123.62  200.0.0.11   tcp   443   
+250014 1970-01-01 01:22:23.773  82.155.123.107  200.0.0.12   tcp   443   
+23386  1970-01-01 01:16:11.089   82.155.123.99  200.0.0.12   tcp   443 
+```
+
+<p align="center">
+    <i> Tabela 1: Conexões com tempo de duração anómalo</i>
+</p>
+
+Isto deu *flag* aos IPs da rede `82.155.123.0/24`, indicando que a duração das conexões superior a 99% do resto do dataset.
+Podendo ser um indicador de um possível ataque, como um ataque slowloris.
+
+Resolvendo o DNS dos seus endereços ip, temos:
+
+```
+82.155.123.146 resolves to bl6-123-146.dsl.telepac.pt.
+82.155.123.47 resolves to bl6-123-47.dsl.telepac.pt.
+82.155.123.100 resolves to bl6-123-100.dsl.telepac.pt.
+82.155.123.210 resolves to bl6-123-210.dsl.telepac.pt.
+82.155.123.62 resolves to bl6-123-62.dsl.telepac.pt.
+82.155.123.107 resolves to bl6-123-107.dsl.telepac.pt.
+82.155.123.99 resolves to bl6-123-99.dsl.telepac.pt.
+82.155.123.23 resolves to bl6-123-23.dsl.telepac.pt.
+82.155.123.135 resolves to bl6-123-135.dsl.telepac.pt.
+82.155.123.61 resolves to bl6-123-61.dsl.telepac.pt.
+```
+<p align="center">
+    <i> Tabela 2: Resolução de DNS dos IPs da rede</i>
+</p>
+
+Os endereços IP fornecidos resolvem para domínios sob o domínio telepac.pt, que está associado a um serviço DSL (Digital
+Subscriber Line) da Telepac, um fornecedor de telecomunicações em Portugal. 
+
+Estes IPs encontram-se listados como 'Abused' no AbuseIPDB, o que pode indicar que estes IPs são usados para um ataque.
 
 #### Estatistica por IP
 
-<img src="img_8.png">
-
+<img src="img/img_8.png">
 
 ## Definição das regras SIEM
 
@@ -463,9 +539,9 @@ Foram definidas com base nas análises realizadas e seguem a seguinte estrutura:
       massivos, o que pode ser uma atividade maliciosa, como o roubo de dados ou a transmissão de informação sensível
       para fora da rede.
 11. **Monitorização de IPs Específicos**
-    - **Regra**: Manter um monitoramento constante do IP 82.155.123.113 devido ao seu comportamento anómalo e picos de
+    - **Regra**: Manter um monitoramento constante dos IPs 82.155.123.0 devido ao seu comportamento anómalo e picos de
       tráfego.
-    - **Justificação**: O ip 82.155.123.113 mostrou padrões de tráfego anómalos, incluindo picos significativos de
+    - **Justificação**: O ip 82.155.123.0 mostrou padrões de tráfego anómalos, incluindo picos significativos de
       dados. A monitorização contínua ajuda a identificar atividades incomuns e a responder rapidamente a possíveis
       incidentes de segurança.
 12. **Alertas de Alta Frequência de Pacotes**
@@ -512,7 +588,7 @@ como a duração das conexões e o comportamento ao longo do tempo, o que propor
 padrões de tráfego. Além disso, a automação de algumas análises tornaria o processo mais eficiente e menos suscetível a
 erros humanos.
 
-Em suma, este trabalho proporcionou um aprendizado significativo sobre a análise de tráfego de rede e a implementação de
+Em suma, este trabalho proporcionou uma aprendizagem significativa na análise de tráfego de rede e a implementação de
 sistemas de deteção de intrusões. Adquirimos habilidades importantes na análise de grandes volumes de dados de tráfego
 de rede para identificar padrões e anomalias, bem como na definição e implementação de regras SIEM eficazes baseadas em
 dados concretos. Estes conhecimentos e habilidades adquiridos são fundamentais para futuras análises e implementações em
