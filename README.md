@@ -12,9 +12,10 @@
 3. Conteúdo utilizado
 4. Implementação
     1. Processo de Análise
-    2. Análise dos comportamentos não anómalos
-    3. Definição das regras SIEM
-    4. Teste das regras SIEM e identificação dos dispositivos comprometidos
+    2. Análise dos comportamentos anómalos internos
+    3. Análise dos comportamentos anómalos do *server dataset* 
+    4. Definição das regras SIEM
+    5. Teste das regras SIEM e identificação dos dispositivos comprometidos
 5. Conclusão
 
 ## Introdução
@@ -84,7 +85,7 @@ geral dos comportamentos a procurar.
     - [x] Tentar identificar o tipo de comprometimento (BotNet, exfiltração de dados, C&C)
     - [x] Justificar a identificação dos dispositivos comprometidos
 
-## Análise dos comportamentos não anómalos
+## Análise dos comportamentos anómalos
 
 No dataset não anómalo, são analisados os comportamentos não anómalos dos utilizadores internos e das suas comunicações
 com a rede interna e com as redes externas.
@@ -256,8 +257,8 @@ Os gráficos apresentados mostram a análise do rácio de download/upload por en
 anómalo e anómalo. Estes gráficos são cruciais para identificar padrões de tráfego e potenciais anomalias na rede.
 
 <div style="display: flex; justify-content: center;">
-    <img src="img/download_upload.png" alt="Rácio de Download/Upload por Endereço de Origem" width="700">
-    <img src="img/download_upload2.png" alt="Rácio de Download/Upload por Endereço de Origem" width="700">
+    <img src="img/download_upload.png" alt="Rácio de Download/Upload por Endereço de Origem" width="600">
+    <img src="img/download_upload2.png" alt="Rácio de Download/Upload por Endereço de Origem" width="600">
 </div>
 <p align="center">
     <i> Figura 4: Rácio de _download_/_upload_ por endereço de origem no dataset não anómalo (esquerda) e anómalo (direita)</i>
@@ -278,8 +279,8 @@ específicos, indicando uma quantidade anormalmente alta de uploads. Esses picos
 suspeitas, como exfiltração de dados, onde um atacante tenta enviar grandes volumes de informação para fora da rede.
 
 <div style="display: flex; justify-content: center;">
-    <img src="img/download_upload_dns.png" alt="Rácio de Download/Upload por Endereço de Origem" width="700">
-    <img src="img/download_upload_dns2.png" alt="Rácio de Download/Upload por Endereço de Origem" width="700">
+    <img src="img/download_upload_dns.png" alt="Rácio de Download/Upload por Endereço de Origem" width="600">
+    <img src="img/download_upload_dns2.png" alt="Rácio de Download/Upload por Endereço de Origem" width="600">
 </div>
 <p align="center">
     <i> Figura 5: Rácio de _download_/_upload_ por endereço de origem no dataset não anómalo (esquerda) e anómalo (direita) para pacotes DNS</i>
