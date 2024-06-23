@@ -45,7 +45,7 @@ Na realização deste trabalho, as tarefas a serem realizadas são as seguintes:
     - [x] Exfiltração de dados usando HTTPS e/ou DNS
     - [x] Atividades de C&C usando DNS e utilizadores externos usando os serviços públicos empresariais de forma anómala
 - [x] Teste das regras SIEM e identificação dos dispositivos com comportamentos anómalos (6 valores).
-- [ ] Relatório (4 valores)
+- [x] Relatório (4 valores)
 
 ## Conteúdo utilizado
 
