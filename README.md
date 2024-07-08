@@ -1,4 +1,4 @@
-# _Monitoring & SIEM_ - Trabalho Prático 2 de Segurança em Redes de Computadores
+# _Monitoring & SIEM_
 
 ## Autores
 
